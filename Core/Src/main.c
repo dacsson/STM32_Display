@@ -101,15 +101,6 @@ const int Logo122[4][122]=//122x32 pixel, каждые 8 вертикальны�
 int get_nth_bit(int by, int n) {
 	unsigned int mask = 1 << n;
 	return by & mask;
-//	for (; mask != 0; mask >>= 1) {
-//
-//	    if (b & mask) {
-//	        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, b);
-//	    }
-//	    else {
-//	        // bit is 0
-//	    }
-//	}
 }
 
 // Процедура выдачи байта в индикатор
@@ -117,11 +108,6 @@ void write_byte_lcd_indic(byte b, bit cd, bit lr) {
 	// RW IS ALWAYS GROUNDED
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, cd); //Выдача байта в индикатор как данных или команды LCD_A0
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, lr); // LCD.D=b; //Выбрать кристалл индикатора и выдать байт на шину данных индикатора
-//	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, b);
-//	for(int i = 0; i < 8; i++) {
-//		int nth_b = get_nth_bit(b, i);
-//		HAL_GPIO_WritePin(GPIOC, pins[i], nth_b);
-//	}
 
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_0, get_nth_bit(b, 0));
 	auto readpin = get_nth_bit(b, 0);
@@ -156,16 +142,14 @@ byte b;
 	HAL_Delay(1);		//Это время предустановки адреса (tAW)
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, 0); // LCD.E=0;
 	HAL_Delay(1);	//Минимально допустимая длительность сигнала E=0 (время доступа (tACC) попало сюда)
-//	for(int i = 0; i < 7; i++) {
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) << 0;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) << 1;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) << 2;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) << 3;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4) << 4;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) << 5;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6) << 6;
-		b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7) << 7;
-//	}
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0) << 0;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1) << 1;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2) << 2;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3) << 3;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_4) << 4;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) << 5;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_6) << 6;
+  b = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_7) << 7;
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, 1); // LCD.E=1;		//Сбросить сигнал E индикатору
 	HAL_Delay(1);	//Минимально допустимый интервал между сигналами E=0
 
@@ -311,86 +295,11 @@ void lcd_init() {
 
 	// ====== DRAW ======
 
-
-
 	// Write data
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, 1); // LCD_A to 1
 	HAL_Delay(2);
 	draw();
-	/*
-	// 1 p
-	write_code_l(0|0xB8);
-	write_code_r(0|0xB8);
-	write_code_l(0x13);
-	write_code_l(0x00);
-	write_data_l(0xFF);
-	write_data_l(0xA4);
-	write_data_l(0xEE);
-	write_code_r(0x13);
-	write_code_r(0x00);
-	write_data_r(0xFF);
-	write_data_r(0xA4);
-	write_data_r(0xEE);
-
-	// 2 p
-	write_code_l(1|0xB8);
-	write_code_r(1|0xB8);
-	write_code_l(0x13);
-	write_code_l(0x00);
-	write_data_l(0xFF);
-	write_data_l(0xA4);
-	write_data_l(0xEE);
-	write_code_r(0x13);
-	write_code_r(0x00);
-	write_data_r(0xFF);
-	write_data_r(0xA4);
-	write_data_r(0xEE);
-
-	// 3 p
-	write_code_l(2|0xB8);
-	write_code_r(2|0xB8);
-	write_code_l(0x13);
-	write_code_l(0x00);
-	write_data_l(0xFF);
-	write_data_l(0xA4);
-	write_data_l(0xEE);
-	write_code_r(0x13);
-	write_code_r(0x00);
-	write_data_r(0xFF);
-	write_data_r(0xA4);
-	write_data_r(0xEE);
-
-	// 4 p
-	write_code_l(1|0xB8);
-	write_code_r(1|0xB8);
-	write_code_l(0x13);
-	write_code_l(0x00);
-	write_data_l(0xFF);
-	write_data_l(0xA4);
-	write_data_l(0xEE);
-	write_code_r(0x13);
-	write_code_r(0x00);
-	write_data_r(0xFF);
-	write_data_r(0xA4);
-	write_data_r(0xEE);
-	*/
-//	for(p=0; p<4; p++) {//Цикл по всем 4-м страницам индикатора
-//		//Установка текущей страницы для левого кристалла индикатора
-//		write_code_l(0x13);//Установка текущего адреса для записи данных в левую отображаемую позицию левой половины индикатора
-//		for(c=0; c<61; c++) {//Цикл вывода данных в левую половину индикатора
-//			write_data_l(Logo122[p][c]);//Вывод очередного байта в индикатор
-//		}
-//		write_code_r(p|0xB8);//Установка текущей страницы для правого кристалла индикатора
-//		write_code_r(0x00);//Установка текущего адреса для записи данных в левую отображаемую позицию правой половины индикатора
-//		for(c=61; c<122; c++) {//Цикл вывода данных в правую половину индикатора
-//			write_data_r(Logo122[p][c]);//Вывод очередного байта в индикатор
-//		}
-//	}
-
-	// ====== DRAW ======
-//	draw();
-//	HAL_Delay(2);
-//	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, 0); // LCD_A to 1
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, 0); // LCD_A to 1
 
 }
 
@@ -406,13 +315,8 @@ void on_click_turn_on_display()
   if(HAL_GPIO_ReadPin( GPIOB, GPIO_PIN_2)) {
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 
-//			  HAL_UART_Transmit(huart, pData, Size, Timeout)
-//		  HAL_LCD_Write(hlcd, RAMRegisterIndex, RAMRegisterMask, Data);
-//	  check = 1;
   } else {
-//	  readpin1 = HAL_GPIO_ReadPin( GPIOC, GPIO_PIN_2);
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-//	  check = 0;
   }
 }
 
@@ -463,25 +367,6 @@ int main(void)
 		  // LCD ON
 		  lcd_init();
 	  }
-//	 	  else {
-//	 		  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, SET);
-//	 //		  byte	p;//Номер текущей страницы индикатора
-//	 //		  byte	c;//Позиция по горизонтали выводимого байта
-//
-//	 		lcd_init();
-//	 //		for(p=0; p<4; p++) {//Цикл по всем 4-м страницам индикатора
-//	 //			write_code_l(p|0xB8);//Установка текущей страницы для левого кристалла индикатора
-//	 //			write_code_l(0x13);//Установка текущего адреса для записи данных в левую отображаемую позицию левой половины индикатора
-//	 //			for(c=0; c<61; c++) {//Цикл вывода данных в левую половину индикатора
-//	 //				write_data_l(Logo122[p][c]);//Вывод очередного байта в индикатор
-//	 //			}
-//	 //			write_code_r(p|0xB8);//Установка текущей страницы для правого кристалла индикатора
-//	 //			write_code_r(0x00);//Установка текущего адреса для записи данных в левую отображаемую позицию правой половины индикатора
-//	 //			for(c=61; c<122; c++) {//Цикл вывода данных в правую половину индикатора
-//	 //				write_data_r(Logo122[p][c]);//Вывод очередного байта в индикатор
-//	 //			}
-//	 //		}
-//	 	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
